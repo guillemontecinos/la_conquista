@@ -17,3 +17,12 @@ Tareas
 * Se necesita una forma de hacer encuestas en vivo (live poll)
 * Probé en voxvote.com, pero el formateo de la imagen y gráfico con respuestas es complejo. MJ necesita que el gráfico sea de torta y la imagen de la pregunta se vea más grande.
 * Puedes entrar a mi cuenta de voxvote para inspirarte.
+
+## 24 de mayo de 2018
+### Aplicación domestik: modificaciones
+* exportación a syphon no permite usar filtro sepia, hay que hacerlo a manno
+* la pantalla de salida de processing tendrá dimensiones de (990 x 450) y será mapeada en madmapper a tres pantallas de dimensiones proporcionales
+* el despliegue de las cámaras debe ser de tres formas:
+* a) una cámara extendida que se mapee dividida en las tres pantallas
+* b) las 3 cámaras horizontales mapeadas una en cada pantalla
+* c) la opción de mapear una, dos o tres de las tres cámaras a sus correspondientes pantallas en el escenario
