@@ -1,15 +1,19 @@
 //la conquista app
 //by aaron montoya-moraga and guillermo montecinos
-//commisioned by maria jose contreras, trinidad piriz & rozana gomez
-//based on daniel shiffman's kinect raw depth data example, & Dometik app devolped by montoya-moraga & montecinos
-//v0.0.1
+//commisioned by maria jose contreras, trinidad piriz & roxana gomez
+//based on daniel shiffman's kinect raw depth data example, & Domestik app devolped by montoya-moraga & guillermo montecinos
+//v0.0.2
 //may 2018
 
 //import libraries
-import ipcapture.*; //image capture
-import org.openkinect.processing.*; //kinect capture
-import ddf.minim.*; //audio processing
-import codeanticode.syphon.*; //syphon connection
+//image capture
+import ipcapture.*;
+//kinect capture
+import org.openkinect.processing.*; 
+//audio processing
+import ddf.minim.*; 
+//syphon connection
+import codeanticode.syphon.*; 
 
 //objects
 
@@ -22,7 +26,7 @@ Kinect2 kinect2;
 //minim object
 Minim minim;
 //minim input
-AudioInput in;
+AudioInput audioInput;
 
 //variables
 
@@ -64,20 +68,31 @@ boolean isGray = true;
 
 //setup function
 void setup(){
+  
+  //Processing window
   size(990, 450, P3D);
+  
+  //image on buffer
   canvas = createGraphics(990, 450, P3D);
+  
   //Syphon server initialization
   server = new SyphonServer(this, "Processing Syphon");
-  //Kinect Setup
+  
+  //Kinect setup
   kinectSetup();
+  
+  //minim setup
+  
   // domestik app setup
   setupDomestik();
+  
   //for hiding the cursor
   noCursor();
 }
 
 //draw loop
 void draw(){
+  
   //Syphon open drawing
   canvas.beginDraw();
   canvas.background(0);
@@ -98,18 +113,26 @@ void draw(){
 }
 
 //===========================
-//Kinect processing functions
+//setup functions
 //===========================
 
 void kinectSetup(){
-  //Kinect intialization
+  //constructor function
   kinect2 = new Kinect2(this);
+  //ask for depth image
   kinect2.initDepth();
+  //start device
   kinect2.initDevice();
-  //Minim initialization
-  minim = new Minim(this);
-  in = minim.getLineIn();
 }
+
+void minimSetup() {
+   minim = new Minim(this);
+  audioInput = minim.getLineIn();
+}
+
+//===========================
+//Kinect processing functions
+//===========================
 
 void kinectDisplay(){
   // Translate and rotate
@@ -135,7 +158,7 @@ void kinectDisplay(){
       }
       else if(soundOption == 2){
       //sound responsivity on depth axis
-        d = int(depth[offset]+500*in.mix.get(0));
+        d = int(depth[offset] + 500 * audioInput.mix.get(0));
       }
       else if(soundOption == 3){
       //sound responsivity in x-y plane, using randomness from samples 0 & 1 of Line in
@@ -143,7 +166,7 @@ void kinectDisplay(){
       }
       else if(soundOption == 4){
       //sound responsivity on depth axis
-        d = int(depth[offset]+500*in.mix.get(2));
+        d = int(depth[offset] + 500 * audioInput.mix.get(2));
       }
       
       //calculte the x, y, z camera position based on the depth information
@@ -156,10 +179,10 @@ void kinectDisplay(){
           canvas.vertex(point.x, point.y, point.z);
         }
         else if(soundOption == 3){
-          canvas.vertex(point.x+int(random(500*in.mix.get(0))), point.y+int(random(500*in.mix.get(1))), point.z);
+          canvas.vertex(point.x + int(random(500 * audioInput.mix.get(0))), point.y+int(random(500 * audioInput.mix.get(1))), point.z);
         }
         else if(soundOption == 4){
-          canvas.vertex(point.x+int(random(250*in.mix.get(0))), point.y+int(random(250*in.mix.get(1))), point.z);
+          canvas.vertex(point.x+int(random(250 * audioInput.mix.get(0))), point.y+int(random(250 * audioInput.mix.get(1))), point.z);
         }
         // Draw a point
         //Sound responsive oscillation 1
@@ -182,9 +205,9 @@ PVector depthToPointCloudPos(int x, int y, float depthValue) {
   return point;
 }
 
-//===========================
+//=================================
 //Domestik app processing functions
-//===========================
+//=================================
 
 void setupDomestik(){
   //change ip address here
@@ -206,14 +229,11 @@ void setupDomestik(){
 void displayDomestik(){
   //get images from cameras
   readCameras();
-
   howManyCameras();
-
   displayCameras();
 }
 
 void readCameras() {
-
   //start cameras
   for (int i = 0; i < cams.length; i++) {
     if (cams[i].isAvailable()) {
@@ -310,9 +330,24 @@ void displayCameras() {
   }
   if (isGray == true) {
     //grayscale filter
-    //TODO: gray filtering doesn't export to madmapper via syphon. make pixel filtering 
+    //TODO: gray filtering doesn't export to madmapper via syphon. make pixel filtering
+    //MAYBE: hice esta funcion maybeGray, quizas funciona? jiji
     canvas.filter(GRAY);
+    maybeGray();
   }
+}
+
+void maybeGray() {
+  canvas.loadPixels();
+  for (int i = 0; i < canvas.width; i++) {
+    for (int j = 0; j < canvas.height; j++) {
+      color originalColor = pixels[ i + j * canvas.width]; 
+      float grayValue = (red(originalColor) + green(originalColor) + blue(originalColor)) / 3;
+      pixels[i + j * canvas.width] = color(grayValue);
+    }
+  }
+  canvas.updatePixels();
+  
 }
 
 
