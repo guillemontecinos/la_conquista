@@ -211,9 +211,9 @@ PVector depthToPointCloudPos(int x, int y, float depthValue) {
 
 void setupDomestik(){
   //change ip address here
-  cams[0] = new IPCapture(this, "http://169.254.121.118/live", "", "");
-  cams[1] = new IPCapture(this, "http://169.254.161.62/live", "", "");
-  cams[2] = new IPCapture(this, "http://169.254.44.110/live", "", "");
+  cams[0] = new IPCapture(this, "http://169.254.48.201/live", "", "");
+  cams[1] = new IPCapture(this, "http://169.254.80.112/live", "", "");
+  cams[2] = new IPCapture(this, "http://169.254.111.209/live", "", "");
 
   //start cameras
   for (int i = 0; i < cams.length; i++) {
@@ -333,7 +333,7 @@ void displayCameras() {
     //TODO: gray filtering doesn't export to madmapper via syphon. make pixel filtering
     //MAYBE: hice esta funcion maybeGray, quizas funciona? jiji
     canvas.filter(GRAY);
-    maybeGray();
+    //maybeGray();
   }
 }
 

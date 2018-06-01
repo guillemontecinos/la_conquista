@@ -26,3 +26,15 @@ Tareas
 * a) una cámara extendida que se mapee dividida en las tres pantallas
 * b) las 3 cámaras horizontales mapeadas una en cada pantalla
 * c) la opción de mapear una, dos o tres de las tres cámaras a sus correspondientes pantallas en el escenario.
+
+## 31 de mayo de 2018
+### Apuntes ensayo
+* Conectar midi pada para controlar cambios de escena
+* Probar con Roli Block
+* Instalar servidor y Probar sketch para moralgame
+* Audio?
+
+### Apuntes ensayo sábado siguiente
+* Probar distancia de proyectos: 7,4 m / 10,8 m
+* Documentar
+* Probar control midi
