@@ -7,11 +7,13 @@ SyphonServer server;
 
 
 PFont font;
-int y = 0;
+int yScan = 0;
+int xScan = 0;
 String myText[] = {"","",""};
-boolean noise = false;
-boolean scanner = false;
-boolean textDisplay = false;
+boolean noiseBD = false;
+boolean scanVertBD = false;
+boolean scanHorBD = false;
+boolean textDisplayBD = false;
 
 void setup(){
   size(990, 450, P3D);
@@ -22,8 +24,6 @@ void setup(){
   
   //Syphon server initialization
   server = new SyphonServer(this, "Processing Syphon");
-  
-  
 }
 
 void draw(){
@@ -32,37 +32,7 @@ void draw(){
   //Syphon open drawing
   canvas.beginDraw();
   
-  if(noise){
-    canvas.loadPixels();
-    
-    for(int i = 0; i < canvas.width; i++){
-      for(int j = 0; j < canvas.height; j++){
-        canvas.pixels[i + j * canvas.width] = color(int(random(180)));
-      }
-    }
-    canvas.updatePixels();
-  }
-  else if(scanner){
-    canvas.background(0);
-    //canvas.stroke(255);
-    canvas.stroke(43,215,49);
-    canvas.strokeWeight(3);
-    canvas.line(0,y,width,y);
-    
-    y++;
-    
-    if(y>height)
-    {
-      y=0;
-    }
-  }
-  else if(textDisplay){
-    canvas.background(0);
-    writeText();
-  }
-  else{
-    canvas.background(0);
-  }
+  displayBD();
   
   //Syphon end drawing
   canvas.endDraw();
@@ -72,17 +42,70 @@ void draw(){
   server.sendImage(canvas);
 }
 
-void writeText(){
+void displayBD(){
+  if(noiseBD){
+    canvas.loadPixels();
+    
+    for(int i = 0; i < canvas.width; i++){
+      for(int j = 0; j < canvas.height; j++){
+        canvas.pixels[i + j * canvas.width] = color(int(random(180)));
+      }
+    }
+    canvas.updatePixels();
+  }
+  else if(scanVertBD){
+    canvas.background(0,90);
+    canvas.stroke(255);
+    canvas.strokeWeight(3);
+    canvas.line(0,yScan,width,yScan);
+    
+    yScan++;
+    
+    if(yScan > height)
+    {
+      yScan = 0;
+    }
+  }
+  else if(scanHorBD){
+    canvas.background(0,90);
+    canvas.stroke(255);
+    canvas.strokeWeight(3);
+    canvas.line(xScan,0,xScan,height);
+    
+    xScan++;
+    
+    if(xScan > width){
+      xScan = 0;
+    }
+  }
+  else if(textDisplayBD){
+    canvas.background(0);
+    writeTextBD();
+  }
+  else{
+    canvas.background(0);
+  }
+}
+
+void writeTextBD(){
    canvas.textFont(font);
    canvas.textSize(20);
    canvas.fill(255);
    for(int i = 0; i< myText.length; i++){
      canvas.text(myText[i],i*width/3,10,width/3,height);
-     if(random(1)<0.1){
+     if(random(1)<0.07){
        //binarios
-       //myText[i] +=  String.valueOf(int(random(0,2)));
+       if(myText[0].length() < 540){
+         myText[0] +=  String.valueOf(int(random(0,2)));
+       }
+       else if(myText[1].length() < 540){
+         myText[1] +=  String.valueOf(int(random(0,2)));
+       }
+       else if(myText[2].length() < 540){
+         myText[2] +=  String.valueOf(int(random(0,2)));
+       }
        //texto random
-       myText[i] +=  Character.toString((char)int(random(64,127)));
+       //myText[i] +=  Character.toString((char)int(random(64,127)));
      }
    }
 }
@@ -91,16 +114,21 @@ void writeText(){
 
 void keyPressed(){
   if(key == '1'){
-    noise = !noise;
+    noiseBD = !noiseBD;
   }
   
   if(key == '2'){
-    scanner = !scanner;
-    y=0;
+    scanVertBD = !scanVertBD;
+    yScan = 0;
   }
   
   if(key == '3'){
-    textDisplay = !textDisplay;
+    scanHorBD = !scanHorBD;
+    xScan = 0;
+  }
+  
+  if(key == '4'){
+    textDisplayBD = !textDisplayBD;
     for(int i=0;i<myText.length;i++){
       myText[i]="";
     }

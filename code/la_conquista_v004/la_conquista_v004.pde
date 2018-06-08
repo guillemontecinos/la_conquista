@@ -2,7 +2,7 @@
 //by aaron montoya-moraga and guillermo montecinos
 //commisioned by maria jose contreras, trinidad piriz & roxana gomez
 //based on daniel shiffman's kinect raw depth data example, & Domestik app devolped by montoya-moraga & guillermo montecinos
-//v0.0.3
+//v0.0.4
 //may 2018
 
 //import libraries
@@ -36,13 +36,27 @@ MidiBus myBus;
 //variables
 
 //main control vars
-int scene = 0; //0: blackout, 1: domestik, 2: kinect
+int scene = 0; //0: blackout, 1: domestik, 2:moral game, 3:big data, 4: kinect
 boolean domestikScene = false;
+boolean moralGameScene = false;
+boolean bigDataScene = false;
 boolean kinectScene = false;
 
+//Kinect Scene vars
 //kinect audio processing vars
 int soundOption = 1;
 
+//Big Data Scene vars
+PFont font;
+int yScan = 0; //y position for vertical scanning
+int xScan = 0; //x position for horizontal scanning
+String myText[] = {"","",""}; //string array for binary random writting
+boolean noiseBD = false;
+boolean scanVertBD = false;
+boolean scanHorBD = false;
+boolean textDisplayBD = false;
+
+// Domestik Scene vars
 //IPCamera image processing vars
 //press 1 to toggle cam 1
 //press 2 to toggle cam 2
@@ -97,6 +111,9 @@ void setup(){
   
   //for hiding the cursor
   noCursor();
+  
+  //font loading
+  font = loadFont("Courier-48.vlw");
 }
 
 //draw loop
@@ -108,12 +125,20 @@ void draw(){
   
   //Syphon open drawing
   canvas.beginDraw();
-  canvas.background(0);
   
-  if(scene == 1){
+  if(scene == 0){
+    canvas.background(0);
+  }
+  else if(scene == 1){
     displayDomestik();
   }
   else if(scene == 2){
+    //Moral Game
+  }
+  else if(scene == 3){
+    displayBD();
+  }
+  else if(scene == 4){
     kinectDisplay();
   }
   
@@ -360,7 +385,86 @@ void maybeGray() {
     }
   }
   canvas.updatePixels();
-  
+}
+
+//=================================
+//Big Data Scene Functions
+//=================================
+
+void displayBD(){
+  if(noiseBD){
+    canvas.loadPixels();
+    
+    for(int i = 0; i < canvas.width; i++){
+      for(int j = 0; j < canvas.height; j++){
+        canvas.pixels[i + j * canvas.width] = color(int(random(180)));
+      }
+    }
+    canvas.updatePixels();
+  }
+  else if(scanVertBD){
+    canvas.background(0,90);
+    canvas.stroke(255);
+    canvas.strokeWeight(3);
+    canvas.line(0,yScan,width,yScan);
+    
+    yScan++;
+    
+    if(yScan > height)
+    {
+      yScan = 0;
+    }
+  }
+  else if(scanHorBD){
+    canvas.background(0,90);
+    canvas.stroke(255);
+    canvas.strokeWeight(3);
+    canvas.line(xScan,0,xScan,height);
+    
+    xScan++;
+    
+    if(xScan > width){
+      xScan = 0;
+    }
+  }
+  else if(textDisplayBD){
+    canvas.background(0);
+    writeTextBD();
+  }
+  else{
+    canvas.background(0);
+  }
+}
+
+void writeTextBD(){
+   canvas.textFont(font);
+   canvas.textSize(20);
+   canvas.fill(255);
+   for(int i = 0; i< myText.length; i++){
+     canvas.text(myText[i],i*width/3,10,width/3,height);
+     if(random(1)<0.07){
+       //binarios
+       if(myText[0].length() < 540){
+         myText[0] +=  String.valueOf(int(random(0,2)));
+       }
+       else if(myText[1].length() < 540){
+         myText[1] +=  String.valueOf(int(random(0,2)));
+       }
+       else if(myText[2].length() < 540){
+         myText[2] +=  String.valueOf(int(random(0,2)));
+       }
+       //texto random
+       //myText[i] +=  Character.toString((char)int(random(64,127)));
+     }
+   }
+}
+
+void resetBD(){
+  xScan = 0;
+  yScan = 0;
+  for(int i=0;i<myText.length;i++){
+      myText[i]="";
+  }
 }
 
 //=================================
@@ -369,15 +473,21 @@ void maybeGray() {
 
 //Converts boolean control variables into scene int variable
 void sceneControl(){
-  if(domestikScene == false && kinectScene == false){
+  if(domestikScene == false && moralGameScene == false && bigDataScene == false && kinectScene == false){
     scene = 0;
     println("Blackout scene");
   }
-  else if(domestikScene == true && kinectScene == false){
-    scene = 1;
+  else if(domestikScene == true && moralGameScene == false && bigDataScene == false && kinectScene == false){
+    scene = 1; //demestik
   }
-  else if(domestikScene == false && kinectScene == true){
-    scene = 2;
+  else if(domestikScene == false && moralGameScene == true && bigDataScene == false && kinectScene == false){
+    scene = 2; //moral game
+  }
+  else if(domestikScene == false && moralGameScene == false && bigDataScene == true && kinectScene == false){
+    scene = 3; //big data
+  }
+  else if(domestikScene == false && moralGameScene == false && bigDataScene == false && kinectScene == true){
+    scene = 4; //kinect
   }
 }
 
@@ -390,6 +500,42 @@ void noteOn(int channel, int pitch, int velocity) {
   println("Channel:"+channel);
   println("Pitch:"+pitch);
   println("Velocity:"+velocity);
+  //Big Data Scene Control
+  if(pitch == 51){
+    scanVertBD = !scanVertBD;
+    if(scanVertBD == true){
+      scanHorBD = false;
+      noiseBD = false;
+      textDisplayBD = false;
+      resetBD();
+    }
+  }
+  if(pitch == 52){
+    scanHorBD = !scanHorBD;
+    if(scanHorBD == true){
+      scanVertBD = false;
+      noiseBD = false;
+      textDisplayBD = false;
+      resetBD();
+    }
+  }
+  if(pitch == 53){
+    noiseBD = !noiseBD;
+    if(noiseBD == true){
+      scanVertBD = false;
+      scanHorBD = false;
+      textDisplayBD = false;
+    }
+  }
+  if(pitch == 54){
+    textDisplayBD = !textDisplayBD;
+    if(textDisplayBD == true){
+      scanVertBD = false;
+      scanHorBD = false;
+      noiseBD = false;
+      resetBD();
+    }
+  }
   //Camera Control
   if (pitch == 71){
     showCam[0] = !showCam[0];
@@ -412,37 +558,74 @@ void noteOn(int channel, int pitch, int velocity) {
   if (pitch == 81 ) {
    domestikScene = !domestikScene;
    if(domestikScene == true){
+     moralGameScene = false;
+     bigDataScene = false;
      kinectScene = false;
      println("Domestik scene");
    }
   }
   if (pitch == 82 ) {
+   moralGameScene = !moralGameScene;
+   if(moralGameScene == true){
+     domestikScene = false;
+     bigDataScene = false;
+     kinectScene = false;
+     println("Moral Game scene");
+   }
+  }
+  if (pitch == 83 ) {
+   bigDataScene = !bigDataScene;
+   if(bigDataScene == true){
+     domestikScene = false;
+     moralGameScene = false;
+     kinectScene = false;
+     println("Big Data scene");
+     resetBD();
+   }
+  }
+  if (pitch == 84 ) {
    kinectScene = !kinectScene;
    if(kinectScene == true){
      domestikScene = false;
-     println("Kinect scene");
+     moralGameScene = false;
+     bigDataScene = false;
+     println("Kinect");
    }
   }
 }
 
 //MIDI feedback to controller. Makes leds blink
 void ledBlink(){
-  //Scene control
-  if(domestikScene == true){
-    myBus.sendNoteOn(1,81,127);
+  //====================================
+  //Big Data Scenes control led blinking
+  //====================================
+  if(scanVertBD == true){
+    myBus.sendNoteOn(1,51,127);
   }
   else{
-    myBus.sendNoteOff(1,81,127);
+    myBus.sendNoteOff(1,51,127);
   }
-  if(kinectScene == true){
-    myBus.sendNoteOn(1,82,127);
+  if(scanHorBD == true){
+    myBus.sendNoteOn(1,52,127);
   }
   else{
-    myBus.sendNoteOff(1,82,127);
+    myBus.sendNoteOff(1,52,127);
   }
-  //===========================
-  //Camera control led blinking
-  //===========================
+  if(noiseBD == true){
+    myBus.sendNoteOn(1,53,127);
+  }
+  else{
+    myBus.sendNoteOff(1,53,127);
+  }
+  if(textDisplayBD == true){
+    myBus.sendNoteOn(1,54,127);
+  }
+  else{
+    myBus.sendNoteOff(1,54,127);
+  }
+  //====================================
+  //Domestik Camera control led blinking
+  //====================================
   //camera 1 On
   if(showCam[0] == true){
     myBus.sendNoteOn(1,71,127);
@@ -466,6 +649,33 @@ void ledBlink(){
   //camera 3 Off
   else{
     myBus.sendNoteOff(1,73,127);
+  }
+  //===========================
+  //Scene control led blinking
+  //===========================
+  if(domestikScene == true){
+    myBus.sendNoteOn(1,81,127);
+  }
+  else{
+    myBus.sendNoteOff(1,81,127);
+  }
+  if(moralGameScene == true){
+    myBus.sendNoteOn(1,82,127);
+  }
+  else{
+    myBus.sendNoteOff(1,82,127);
+  }
+  if(bigDataScene == true){
+    myBus.sendNoteOn(1,83,127);
+  }
+  else{
+    myBus.sendNoteOff(1,83,127);
+  }
+  if(kinectScene == true){
+    myBus.sendNoteOn(1,84,127);
+  }
+  else{
+    myBus.sendNoteOff(1,84,127);
   }
 }
 
