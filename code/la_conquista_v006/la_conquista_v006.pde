@@ -265,9 +265,9 @@ PVector depthToPointCloudPos(int x, int y, float depthValue) {
 
 void setupDomestik(){
   //change ip address here
-  cams[0] = new IPCapture(this, "http://169.254.34.75/live", "", "");
-  cams[1] = new IPCapture(this, "http://169.254.37.117/live", "", "");
-  cams[2] = new IPCapture(this, "http://169.254.56.79/live", "", "");
+  cams[0] = new IPCapture(this, "http://169.254.217.120/live", "", "");
+  cams[1] = new IPCapture(this, "http://169.254.217.120/live", "", "");
+  cams[2] = new IPCapture(this, "http://169.254.217.120/live", "", "");
 
   //start cameras
   for (int i = 0; i < cams.length; i++) {
@@ -323,10 +323,10 @@ void howManyCameras() {
 }
 
 void displayCameras() {
-
+  canvas.background(0);
   if (howMany == 0) {
     //black background
-    canvas.background(0);
+    //canvas.background(0);
   } else if (howMany == 1) {
     for (int i = 0; i < cams.length; i++) {
       //check which camera should be displayed
@@ -457,7 +457,7 @@ void displayBD(){
   
   if(textDisplayBD1){
     canvas.background(0);
-    //writeTextBD();
+    //canvas.background(255);
     writeTextBD1();
   }
   if(textDisplayBD2){
@@ -472,6 +472,8 @@ void writeTextBD1(){
    canvas.textFont(font);
    canvas.textSize(20);
    canvas.fill(255);
+   canvas.rect(0,0,width/3,height);
+   canvas.fill(0);
    if(random(1)<0.1){
      myText[0] +=  String.valueOf(int(random(0,2)));
    }
@@ -495,6 +497,8 @@ void writeTextBD3(){
    canvas.textFont(font);
    canvas.textSize(20);
    canvas.fill(255);
+   canvas.rect(2*width/3,0,width/3,height);
+   canvas.fill(0);
    if(random(1)<0.1){
      myText[2] +=  String.valueOf(int(random(0,2)));
    }
