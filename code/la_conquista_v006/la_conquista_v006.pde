@@ -2,8 +2,8 @@
 //by aaron montoya-moraga and guillermo montecinos
 //commisioned by maria jose contreras, trinidad piriz & roxana gomez
 //based on daniel shiffman's kinect raw depth data example, & Domestik app devolped by montoya-moraga & guillermo montecinos
-//v0.0.5
-//may 2018
+//v0.0.6
+//jun 2018
 
 //import libraries
 //image capture
@@ -57,10 +57,14 @@ PFont font;
 int yScan = 0; //y position for vertical scanning
 int xScan = 0; //x position for horizontal scanning
 String myText[] = {"","",""}; //string array for binary random writting
-boolean noiseBD = false;
+boolean whiteOutBD = false;
 boolean scanVertBD = false;
+boolean scanVertFrozBD = false;
 boolean scanHorBD = false;
-boolean textDisplayBD = false;
+boolean noiseBD = false;
+boolean textDisplayBD1 = false;
+boolean textDisplayBD2 = false;
+boolean textDisplayBD3 = false;
 
 // Domestik Scene vars
 //IPCamera image processing vars
@@ -404,9 +408,11 @@ void maybeGray() {
 //=================================
 
 void displayBD(){
-  if(noiseBD){
-    canvas.loadPixels();
-    
+  if(whiteOutBD){
+    canvas.background(255);
+  }
+  else if(noiseBD){
+    canvas.loadPixels();  
     for(int i = 0; i < canvas.width; i++){
       for(int j = 0; j < canvas.height; j++){
         canvas.pixels[i + j * canvas.width] = color(int(random(180)));
@@ -415,9 +421,7 @@ void displayBD(){
     canvas.updatePixels();
   }
   else if(scanVertBD){
-    //canvas.background(0,90);
     canvas.background(255);
-    //canvas.stroke(255);
     canvas.stroke(0);
     canvas.strokeWeight(3);
     canvas.line(0,yScan,width,yScan);
@@ -429,10 +433,14 @@ void displayBD(){
       yScan = 0;
     }
   }
-  else if(scanHorBD){
-    //canvas.background(0,90);
+  else if(scanVertFrozBD){
     canvas.background(255);
-    //canvas.stroke(255);
+    canvas.stroke(0);
+    canvas.strokeWeight(3);
+    canvas.line(0,yScan,width,yScan);
+  }
+  else if(scanHorBD){
+    canvas.background(255);
     canvas.stroke(0);
     canvas.strokeWeight(3);
     canvas.line(xScan,0,xScan,height);
@@ -443,39 +451,54 @@ void displayBD(){
       xScan = 0;
     }
   }
-  else if(textDisplayBD){
-    canvas.background(0);
-    writeTextBD();
-  }
   else{
     canvas.background(0);
   }
+  
+  if(textDisplayBD1){
+    canvas.background(0);
+    //writeTextBD();
+    writeTextBD1();
+  }
+  if(textDisplayBD2){
+    writeTextBD2();
+  }
+  if(textDisplayBD3){
+    writeTextBD3();
+  }
 }
 
-void writeTextBD(){
+void writeTextBD1(){
    canvas.textFont(font);
    canvas.textSize(20);
-   for(int i = 0; i< myText.length; i++){
-     canvas.text(myText[i],i*width/3,10,width/3,height);
-     if(random(1)<0.07){
-       //binarios
-       if(myText[0].length() < 540){
-         canvas.fill(255);
-         myText[0] +=  String.valueOf(int(random(0,2)));
-       }
-       else if(myText[1].length() < 540){
-         canvas.rect(width/3,0,width/3,height);
-         canvas.fill(0);
-         myText[1] +=  String.valueOf(int(random(0,2)));
-       }
-       else if(myText[2].length() < 540){
-         canvas.fill(255);
-         myText[2] +=  String.valueOf(int(random(0,2)));
-       }
-       //texto random
-       //myText[i] +=  Character.toString((char)int(random(64,127)));
-     }
+   canvas.fill(255);
+   if(random(1)<0.1){
+     myText[0] +=  String.valueOf(int(random(0,2)));
    }
+   canvas.text(myText[0],0,10,width/3,height);
+}
+
+void writeTextBD2(){
+   canvas.textFont(font);
+   canvas.textSize(20);
+   canvas.noStroke();
+   canvas.fill(255);
+   canvas.rect(width/3,0,width/3,height);
+   canvas.fill(0);
+   if(random(1)<0.1){
+     myText[1] +=  String.valueOf(int(random(0,2)));
+   }
+   canvas.text(myText[1],width/3,10,width/3,height);
+}
+
+void writeTextBD3(){
+   canvas.textFont(font);
+   canvas.textSize(20);
+   canvas.fill(255);
+   if(random(1)<0.1){
+     myText[2] +=  String.valueOf(int(random(0,2)));
+   }
+   canvas.text(myText[2],2*width/3,10,width/3,height);
 }
 
 void resetBD(){
@@ -538,38 +561,100 @@ void noteOn(int channel, int pitch, int velocity) {
   println("Velocity:"+velocity);
   //Big Data Scene Control
   if(pitch == 51){
-    scanVertBD = !scanVertBD;
-    if(scanVertBD == true){
+    whiteOutBD = !whiteOutBD;
+    if(whiteOutBD == true){
+      scanVertBD = false;
+      scanVertFrozBD = false;
       scanHorBD = false;
       noiseBD = false;
-      textDisplayBD = false;
+      textDisplayBD1 = false;
+      textDisplayBD2 = false;
+      textDisplayBD3 = false;
       resetBD();
     }
   }
   if(pitch == 52){
-    scanHorBD = !scanHorBD;
-    if(scanHorBD == true){
-      scanVertBD = false;
+    scanVertBD = !scanVertBD;
+    if(scanVertBD == true){
+      whiteOutBD = false;
+      scanVertFrozBD = false;
+      scanHorBD = false;
       noiseBD = false;
-      textDisplayBD = false;
+      textDisplayBD1 = false;
+      textDisplayBD2 = false;
+      textDisplayBD3 = false;
       resetBD();
     }
   }
   if(pitch == 53){
-    noiseBD = !noiseBD;
-    if(noiseBD == true){
-      scanVertBD = false;
-      scanHorBD = false;
-      textDisplayBD = false;
-    }
-  }
-  if(pitch == 54){
-    textDisplayBD = !textDisplayBD;
-    if(textDisplayBD == true){
+    scanVertFrozBD = !scanVertFrozBD;
+    if(scanVertFrozBD == true){
+      whiteOutBD = false;
       scanVertBD = false;
       scanHorBD = false;
       noiseBD = false;
+      textDisplayBD1 = false;
+      textDisplayBD2 = false;
+      textDisplayBD3 = false;
+      //resetBD();
+    }
+  }
+  if(pitch == 54){
+    scanHorBD = !scanHorBD;
+    if(scanHorBD == true){
+      whiteOutBD = false;
+      scanVertBD = false;
+      scanVertFrozBD = false;
+      noiseBD = false;
+      textDisplayBD1 = false;
+      textDisplayBD2 = false;
+      textDisplayBD3 = false;
       resetBD();
+    }
+  }
+  if(pitch == 55){
+    noiseBD = !noiseBD;
+    if(noiseBD == true){
+      whiteOutBD = false;
+      scanVertBD = false;
+      scanVertFrozBD = false;
+      scanHorBD = false;
+      textDisplayBD1 = false;
+      textDisplayBD2 = false;
+      textDisplayBD3 = false;
+    }
+  }
+  if(pitch == 56){
+    textDisplayBD1 = !textDisplayBD1;
+    if(textDisplayBD1 == true){
+      whiteOutBD = false;
+      scanVertBD = false;
+      scanVertFrozBD = false;
+      scanHorBD = false;
+      noiseBD = false;
+      myText[0] = "";
+    }
+  }
+  if(pitch == 57){
+    textDisplayBD2 = !textDisplayBD2;
+    if(textDisplayBD2 == true){
+      whiteOutBD = false;
+      scanVertBD = false;
+      scanVertFrozBD = false;
+      scanHorBD = false;
+      noiseBD = false;
+      myText[1] = "";
+    }
+  }
+  if(pitch == 58){
+    textDisplayBD3 = !textDisplayBD3;
+    if(textDisplayBD3 == true){
+      whiteOutBD = false;
+      scanVertBD = false;
+      scanVertFrozBD = false;
+      scanHorBD = false;
+      noiseBD = false;
+      myText[2] = "";
     }
   }
   //Moral Game Scene Control
@@ -669,29 +754,53 @@ void ledBlink(){
   //====================================
   //Big Data Scenes control led blinking
   //====================================
-  if(scanVertBD == true){
+  if(whiteOutBD == true){
     myBus.sendNoteOn(1,51,127);
   }
   else{
     myBus.sendNoteOff(1,51,127);
   }
-  if(scanHorBD == true){
+  if(scanVertBD == true){
     myBus.sendNoteOn(1,52,127);
   }
   else{
     myBus.sendNoteOff(1,52,127);
   }
-  if(noiseBD == true){
+  if(scanVertFrozBD == true){
     myBus.sendNoteOn(1,53,127);
   }
   else{
     myBus.sendNoteOff(1,53,127);
   }
-  if(textDisplayBD == true){
+  if(scanHorBD == true){
     myBus.sendNoteOn(1,54,127);
   }
   else{
     myBus.sendNoteOff(1,54,127);
+  }
+  if(noiseBD == true){
+    myBus.sendNoteOn(1,55,127);
+  }
+  else{
+    myBus.sendNoteOff(1,55,127);
+  }
+  if(textDisplayBD1 == true){
+    myBus.sendNoteOn(1,56,127);
+  }
+  else{
+    myBus.sendNoteOff(1,56,127);
+  }
+  if(textDisplayBD2 == true){
+    myBus.sendNoteOn(1,57,127);
+  }
+  else{
+    myBus.sendNoteOff(1,57,127);
+  }
+  if(textDisplayBD3 == true){
+    myBus.sendNoteOn(1,58,127);
+  }
+  else{
+    myBus.sendNoteOff(1,58,127);
   }
   //====================================
   //Moral Game control led blinking
