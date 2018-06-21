@@ -161,7 +161,7 @@ void draw(){
   //Syphon end drawing
   canvas.endDraw();
   //plotting canvas into screen
-  image(canvas,0,0);
+  //image(canvas,0,0);
   //sending image to madmapper
   server.sendImage(canvas);
 }
@@ -265,10 +265,14 @@ PVector depthToPointCloudPos(int x, int y, float depthValue) {
 
 void setupDomestik(){
   //change ip address here
-  cams[0] = new IPCapture(this, "http://169.254.217.120/live", "", "");
-  cams[1] = new IPCapture(this, "http://169.254.217.120/live", "", "");
-  cams[2] = new IPCapture(this, "http://169.254.217.120/live", "", "");
-
+  /*
+  cams[0] = new IPCapture(this, "http://169.254.232.75/live", "", "");
+  cams[1] = new IPCapture(this, "http://169.254.232.75/live", "", "");
+  cams[2] = new IPCapture(this, "http://169.254.232.75/live", "", "");
+  */
+  cams[0] = new IPCapture(this, "http://10.0.1.2/live", "", "");
+  cams[1] = new IPCapture(this, "http://10.0.1.3/live", "", "");
+  cams[2] = new IPCapture(this, "http://10.0.1.6/live", "", "");
   //start cameras
   for (int i = 0; i < cams.length; i++) {
     cams[i].start();
@@ -305,6 +309,7 @@ void howManyCameras() {
   //iterate through array and count how many cameras are shown
   for (int i = 0; i < showCam.length; i++) {
     if (showCam[i] == true) {
+      //howMany++;
       howMany++;
     }
   }
@@ -334,8 +339,15 @@ void displayCameras() {
         if (isLandscape[i] == true) 
         {
           //one camera in landscape mode
+          
+          
+          canvas.pushMatrix();
+          canvas.imageMode(CENTER);
+          canvas.translate(width/2,height/2);
+          canvas.image(cams[i], 0, 0, width, 480*width/640);
+          //canvas.image(cams[i], 0, 0, width, height);
+          canvas.popMatrix();
           canvas.imageMode(CORNER);
-          canvas.image(cams[i], 0, 0, width, height);
         } else {
           //one camera in portrait mode
           canvas.imageMode(CENTER);
@@ -445,7 +457,8 @@ void displayBD(){
     canvas.strokeWeight(3);
     canvas.line(xScan,0,xScan,height);
     
-    xScan++;
+    //xScan++;
+    xScan+=2;
     
     if(xScan > width){
       xScan = 0;
@@ -474,7 +487,7 @@ void writeTextBD1(){
    canvas.fill(255);
    canvas.rect(0,0,width/3,height);
    canvas.fill(0);
-   if(random(1)<0.1){
+   if(random(1)<0.2){
      myText[0] +=  String.valueOf(int(random(0,2)));
    }
    canvas.text(myText[0],0,10,width/3,height);
@@ -487,7 +500,7 @@ void writeTextBD2(){
    canvas.fill(255);
    canvas.rect(width/3,0,width/3,height);
    canvas.fill(0);
-   if(random(1)<0.1){
+   if(random(1)<0.2){
      myText[1] +=  String.valueOf(int(random(0,2)));
    }
    canvas.text(myText[1],width/3,10,width/3,height);
@@ -499,7 +512,7 @@ void writeTextBD3(){
    canvas.fill(255);
    canvas.rect(2*width/3,0,width/3,height);
    canvas.fill(0);
-   if(random(1)<0.1){
+   if(random(1)<0.2){
      myText[2] +=  String.valueOf(int(random(0,2)));
    }
    canvas.text(myText[2],2*width/3,10,width/3,height);
@@ -517,6 +530,7 @@ void resetBD(){
 //=================================
 void drawMG(){
   canvas.background(0);
+  canvas.imageMode(CORNER);
   if(fotoDisplayMG != 0){
     //Rects
     canvas.noStroke();
@@ -708,6 +722,18 @@ void noteOn(int channel, int pitch, int velocity) {
     }
     delay(100);
     myBus.sendNoteOff(1,74,127);
+  }
+  if(pitch == 75){
+    //camstop
+    for (int i = 0; i < cams.length; i++) {
+      cams[i].stop();
+    }
+  }
+  if(pitch == 76){
+    //camstart
+    for (int i = 0; i < cams.length; i++) {
+      cams[i].start();
+    }
   }
   //Scenes Control
   if (pitch == 81 ) {
