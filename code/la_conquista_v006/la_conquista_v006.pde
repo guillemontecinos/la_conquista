@@ -270,9 +270,9 @@ void setupDomestik(){
   cams[1] = new IPCapture(this, "http://169.254.232.75/live", "", "");
   cams[2] = new IPCapture(this, "http://169.254.232.75/live", "", "");
   */
-  cams[0] = new IPCapture(this, "http://10.0.1.2/live", "", "");
-  cams[1] = new IPCapture(this, "http://10.0.1.3/live", "", "");
-  cams[2] = new IPCapture(this, "http://10.0.1.6/live", "", "");
+  cams[0] = new IPCapture(this, "http://10.0.1.4/live", "", "");
+  cams[1] = new IPCapture(this, "http://10.0.1.6/live", "", "");
+  cams[2] = new IPCapture(this, "http://10.0.1.5/live", "", "");
   //start cameras
   for (int i = 0; i < cams.length; i++) {
     cams[i].start();
